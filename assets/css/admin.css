@@ -1,0 +1,170 @@
+.dmi-wrap {
+    max-width: 900px;
+}
+
+.dmi-card {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin: 16px 0;
+}
+
+.dmi-card h2 {
+    margin-top: 0;
+    padding: 0;
+    font-size: 1.2em;
+}
+
+.dmi-card ol {
+    line-height: 1.8;
+}
+
+.dmi-card code {
+    background: #f0f0f1;
+    padding: 3px 8px;
+    border-radius: 3px;
+    word-break: break-all;
+}
+
+/* Status badges */
+.dmi-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.dmi-status--ok {
+    background: #d4edda;
+    color: #155724;
+}
+
+.dmi-status--warn {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.dmi-status--error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Folder input */
+.dmi-folder-input {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.dmi-folder-input input {
+    flex: 1;
+}
+
+/* Image grid */
+.dmi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.dmi-grid-item {
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+
+.dmi-grid-item:hover {
+    border-color: #2271b1;
+}
+
+.dmi-grid-item.selected {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+    background: #f0f6fc;
+}
+
+.dmi-grid-item .dmi-icon {
+    font-size: 48px;
+    color: #999;
+    margin: 8px 0;
+}
+
+.dmi-grid-item .dmi-name {
+    font-size: 11px;
+    word-break: break-all;
+    color: #555;
+    margin-top: 4px;
+}
+
+.dmi-grid-item .dmi-size {
+    font-size: 10px;
+    color: #999;
+}
+
+.dmi-grid-item .dmi-check {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+}
+
+.dmi-folder-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* Progress bar */
+.dmi-progress {
+    height: 20px;
+    background: #f0f0f1;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.dmi-progress-bar {
+    height: 100%;
+    width: 0;
+    background: #2271b1;
+    transition: width 0.3s ease;
+    border-radius: 10px;
+}
+
+/* Log */
+.dmi-log {
+    max-height: 300px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    padding: 8px;
+    background: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+
+.dmi-log .ok {
+    color: #155724;
+}
+
+.dmi-log .fail {
+    color: #721c24;
+}
+
+/* Textarea */
+#dmi-urls {
+    font-family: monospace;
+    font-size: 13px;
+}
