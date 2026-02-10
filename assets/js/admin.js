@@ -189,10 +189,13 @@
             var $grid = $('#dmi-folder-grid');
 
             res.data.forEach(function (file) {
+                var thumbSrc = dmi.thumb_url + encodeURIComponent(file.id);
                 var $item = $(
                     '<div class="dmi-grid-item" data-id="' + file.id + '">' +
                     '  <input type="checkbox" class="dmi-check" />' +
-                    '  <div class="dmi-icon dashicons dashicons-format-image"></div>' +
+                    '  <div class="dmi-thumb">' +
+                    '    <img src="' + thumbSrc + '" alt="' + file.name + '" loading="lazy" />' +
+                    '  </div>' +
                     '  <div class="dmi-name" title="' + file.name + '">' + file.name + '</div>' +
                     '  <div class="dmi-size">' + formatSize(file.size) + '</div>' +
                     '</div>'

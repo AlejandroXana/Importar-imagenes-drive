@@ -26,6 +26,7 @@ class DMI_Admin {
         // AJAX
         add_action('wp_ajax_dmi_import_files', [$this, 'ajax_import_files']);
         add_action('wp_ajax_dmi_list_folder', [$this, 'ajax_list_folder']);
+        add_action('wp_ajax_dmi_thumbnail', [$this, 'ajax_thumbnail']);
     }
 
     public function add_menu(): void {
@@ -71,8 +72,9 @@ class DMI_Admin {
         wp_enqueue_style('dmi-admin', DMI_PLUGIN_URL . 'assets/css/admin.css', [], DMI_VERSION);
         wp_enqueue_script('dmi-admin', DMI_PLUGIN_URL . 'assets/js/admin.js', ['jquery'], DMI_VERSION, true);
         wp_localize_script('dmi-admin', 'dmi', [
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce'    => wp_create_nonce('dmi_nonce'),
+            'ajax_url'  => admin_url('admin-ajax.php'),
+            'nonce'     => wp_create_nonce('dmi_nonce'),
+            'thumb_url' => admin_url('admin-ajax.php') . '?action=dmi_thumbnail&nonce=' . wp_create_nonce('dmi_nonce') . '&file_id=',
         ]);
     }
 
@@ -298,5 +300,36 @@ class DMI_Admin {
         }
 
         wp_send_json_success($images);
+    }
+
+    /* ───── AJAX: Proxy de miniaturas ───── */
+
+    public function ajax_thumbnail(): void {
+        check_ajax_referer('dmi_nonce', 'nonce');
+
+        if (!current_user_can('upload_files')) {
+            wp_die('Forbidden', 403);
+        }
+
+        $file_id = sanitize_text_field($_GET['file_id'] ?? '');
+
+        if (empty($file_id) || !preg_match('/^[a-zA-Z0-9_-]+$/', $file_id)) {
+            wp_die('Invalid file ID', 400);
+        }
+
+        $thumb = $this->drive->get_thumbnail($file_id);
+
+        if (!$thumb) {
+            // Devolver un placeholder SVG 1x1 transparente
+            header('Content-Type: image/svg+xml');
+            header('Cache-Control: no-cache');
+            echo '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="#f0f0f1"/><text x="100" y="105" text-anchor="middle" fill="#999" font-family="sans-serif" font-size="14">Sin preview</text></svg>';
+            wp_die();
+        }
+
+        header('Content-Type: ' . $thumb['content_type']);
+        header('Cache-Control: public, max-age=3600');
+        echo $thumb['body'];
+        wp_die();
     }
 }

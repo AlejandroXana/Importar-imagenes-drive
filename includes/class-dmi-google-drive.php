@@ -196,7 +196,7 @@ class DMI_Google_Drive {
         do {
             $params = [
                 'q'                  => "'{$folder_id}' in parents and ({$mime_types}) and trashed=false",
-                'fields'             => 'nextPageToken,files(id,name,mimeType,size)',
+                'fields'             => 'nextPageToken,files(id,name,mimeType,size,thumbnailLink)',
                 'pageSize'           => 100,
                 'supportsAllDrives'  => 'true',
                 'includeItemsFromAllDrives' => 'true',
@@ -222,6 +222,58 @@ class DMI_Google_Drive {
         } while ($page_token);
 
         return $images;
+    }
+
+    /**
+     * Obtiene los bytes de la miniatura de un archivo.
+     * Devuelve [content_type, bytes] o null en caso de error.
+     */
+    public function get_thumbnail(string $file_id, int $size = 200): ?array {
+        $token = $this->get_access_token();
+        if (!$token) {
+            return null;
+        }
+
+        // Pedir thumbnailLink al API
+        $response = wp_remote_get(self::DRIVE_API . "/files/{$file_id}?" . http_build_query([
+            'fields'            => 'thumbnailLink',
+            'supportsAllDrives' => 'true',
+        ]), [
+            'headers' => ['Authorization' => "Bearer {$token}"],
+        ]);
+
+        if (is_wp_error($response)) {
+            return null;
+        }
+
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        $thumb_url = $body['thumbnailLink'] ?? null;
+
+        if (!$thumb_url) {
+            // Fallback: descargar el archivo completo como miniatura no es viable,
+            // usar el endpoint de contenido con un rango pequeño tampoco.
+            return null;
+        }
+
+        // thumbnailLink viene con =s220, reemplazar por el tamaño deseado
+        $thumb_url = preg_replace('/=s\d+$/', '=s' . $size, $thumb_url);
+
+        // Descargar la miniatura (el thumbnailLink requiere auth header)
+        $img_response = wp_remote_get($thumb_url, [
+            'headers' => ['Authorization' => "Bearer {$token}"],
+            'timeout' => 15,
+        ]);
+
+        if (is_wp_error($img_response) || wp_remote_retrieve_response_code($img_response) !== 200) {
+            return null;
+        }
+
+        $content_type = wp_remote_retrieve_header($img_response, 'content-type') ?: 'image/png';
+
+        return [
+            'content_type' => $content_type,
+            'body'         => wp_remote_retrieve_body($img_response),
+        ];
     }
 
     /**
